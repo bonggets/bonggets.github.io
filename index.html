@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+
+<!-- Results -->
+<div id="results" class="mt-8 hidden bg-white p-6 rounded-2xl shadow">
+<h2 class="text-2xl font-bold mb-4">Withdrawal Recommendation</h2>
+<p id="action" class="text-lg font-semibold"></p>
+<p id="withdrawal" class="text-xl mt-2"></p>
+<p id="rate" class="mt-2 text-gray-600"></p>
+</div>
+
+
+<!-- Explanation -->
+<div class="mt-10 bg-gray-100 p-6 rounded-2xl">
+<h3 class="font-bold text-xl mb-2">Rules Applied</h3>
+<ul class="list-disc ml-6 text-gray-700">
+<li><b>Inflation Rule:</b> Skip inflation increase if withdrawal rate &gt; 120% of initial.</li>
+<li><b>Capital Preservation:</b> Cut spending 10% if portfolio drops &gt; 20% from start.</li>
+<li><b>Prosperity Rule:</b> Increase spending 10% if withdrawal rate &lt; 80% of initial.</li>
+</ul>
+</div>
+</div>
+
+
+<script>
+function calculate() {
+const portfolio = parseFloat(document.getElementById('portfolio').value);
+const initialPortfolio = parseFloat(document.getElementById('initialPortfolio').value);
+const lastWithdrawal = parseFloat(document.getElementById('lastWithdrawal').value);
+const inflation = parseFloat(document.getElementById('inflation').value) / 100;
+const initialRate = parseFloat(document.getElementById('initialRate').value) / 100;
+
+
+let proposedWithdrawal = lastWithdrawal * (1 + inflation);
+let action = "Inflation adjustment applied.";
+
+
+const currentRate = proposedWithdrawal / portfolio;
+const upperGuardrail = initialRate * 1.2;
+const lowerGuardrail = initialRate * 0.8;
+
+
+// Capital Preservation Rule
+if (portfolio < initialPortfolio * 0.8) {
+proposedWithdrawal *= 0.9;
+action = "Capital Preservation Rule triggered: 10% spending cut.";
+}
+// Inflation Rule
+else if (currentRate > upperGuardrail) {
+proposedWithdrawal = lastWithdrawal;
+action = "Inflation skipped: upper guardrail breached.";
+}
+// Prosperity Rule
+else if (currentRate < lowerGuardrail) {
+proposedWithdrawal *= 1.1;
+action = "Prosperity Rule applied: 10% spending increase.";
+}
+
+
+document.getElementById('results').classList.remove('hidden');
+document.getElementById('action').innerText = action;
+document.getElementById('withdrawal').innerText = `Recommended Withdrawal: $${proposedWithdrawal.toFixed(2)}`;
+document.getElementById('rate').innerText = `Effective Withdrawal Rate: ${(proposedWithdrawal / portfolio * 100).toFixed(2)}%`;
+}
+</script>
+</body>
+</html>
